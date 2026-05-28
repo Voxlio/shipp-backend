@@ -1,5 +1,5 @@
 /**
- * CargoLinkExpress / Shipment - Logistics & Tracking Backend Server
+ * CargoTracker Express / Shipment - Logistics & Tracking Backend Server
  * Technology Stack: Node.js, Express, Filesystem JSON Database, CORS.
  * * Instructions to run on your computer:
  * 1. Install Node.js on your computer (from nodejs.org).
@@ -29,76 +29,8 @@ app.use(express.json()); // Parses incoming JSON data payloads
 // PERSISTENT DATABASE MANAGEMENT
 // ==========================================
 
-// Prepopulated logistics records
-const INITIAL_DATABASE = {
-    "SH-99210": {
-        waybill: "WB-901042-99210",
-        eta: "In 2 Days (May 28, 2026)",
-        location: "New York JFK Cargo Center Hub",
-        status: "In Transit",
-        badgeClass: "bg-amber-500/10 text-amber-500 border border-amber-500/30",
-        step: 3,
-        shipper: "Lux Logistics SA, Paris (CDG)",
-        receiver: "TechCorp Industries, New York (JFK)",
-        service: "Express Air Freight Priority",
-        weight: "245.5 kg",
-        dimensions: "120 × 80 × 95 cm",
-        barcode: "|||| | | ||| || ||| | ||",
-        tempSensor: "18.2°C (Optimal Room Temp)",
-        times: ["May 23, 08:30 AM", "May 24, 11:15 AM", "May 25, 02:45 PM", "Pending Transit"],
-        timeline: [
-            { time: "May 26, 2026 - 10:15 AM", event: "Arrived at USA Import Hub", loc: "New York JFK Cargo Terminal", icon: "fa-plane-arrival", desc: "Transatlantic flight route SH-401 completed. Routed to custom import docks." },
-            { time: "May 25, 2026 - 03:30 AM", event: "In Transit - Flight Departed", loc: "Paris Charles de Gaulle (CDG)", icon: "fa-plane-departure", desc: "Consolidated freight load departed on flight SH-401 eastbound." },
-            { time: "May 24, 2026 - 01:15 PM", event: "Sorted & Export Dock cleared", loc: "Paris CDG Airport Depot", icon: "fa-clipboard-check", desc: "Customs declaration filed, export taxes cleared, secured container load approved." },
-            { time: "May 23, 2026 - 08:30 AM", event: "Manifest Initiated & Picked Up", loc: "Shipper Paris Facility Warehouse", icon: "fa-truck-ramp-box", desc: "Package picked up by express courier. Weight verified, container sealed." }
-        ]
-    },
-    "SH-44023": {
-        waybill: "WB-220194-44023",
-        eta: "Delivered (May 25, 2026)",
-        location: "New York HQ - Dock B (Signed by A. Carter)",
-        status: "Delivered",
-        badgeClass: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30",
-        step: 4,
-        shipper: "Global Auto Parts Corp, Los Angeles (LAX)",
-        receiver: "Manhattan Assembly Lines, New York",
-        service: "Overland Road Freight Cold-Chain",
-        weight: "1,240.0 kg",
-        dimensions: "240 × 120 × 180 cm",
-        barcode: "||| ||| | ||| || || |||",
-        tempSensor: "4.5°C (Refrigerated Controlled)",
-        times: ["May 21, 09:00 AM", "May 22, 02:00 PM", "May 24, 10:45 PM", "May 25, 01:20 PM"],
-        timeline: [
-            { time: "May 25, 2026 - 01:20 PM", event: "Cargo Delivered & Completed", loc: "Manhattan Corporate Assembly Office", icon: "fa-circle-check", desc: "Cargo offloaded. Checked out cleanly. Received and signed by operations lead Andrew Carter." },
-            { time: "May 25, 2026 - 07:45 AM", event: "Out for Final Mile Delivery", loc: "New York Terminal Gate 3", icon: "fa-truck-fast", desc: "Consolidated load transferred to local delivery courier for dock delivery." },
-            { time: "May 24, 10:45 PM", event: "Arrived at Regional Distribution Hub", loc: "New York Jersey Terminals", icon: "fa-warehouse", desc: "Cross-dock de-consolidation initiated. Long-haul trailer disconnected safely." },
-            { time: "May 22, 2026 - 02:00 PM", event: "Interstate Transit Gate Clearance", loc: "Chicago Transit Plaza Checkpoint", icon: "fa-truck", desc: "Midwest route checkpoint verified. Carrier telemetry reports zero mechanical anomalies." },
-            { time: "May 21, 2026 - 09:00 AM", event: "Cargo Picked Up & Sealing Completed", loc: "Los Angeles Depot Loading Ramp", icon: "fa-box-open", desc: "Refrigerated trailer loaded. Barcodes assigned and structural tracking enabled." }
-        ]
-    },
-    "SH-55731": {
-        waybill: "WB-883011-55731",
-        eta: "Customs Hold (Delayed)",
-        location: "Port of Seattle, Customs Clearance Terminal",
-        status: "Customs Exception",
-        badgeClass: "bg-rose-500/10 text-rose-500 border border-rose-500/30",
-        step: 2,
-        shipper: "SinoExport Manufactures, Shanghai Port",
-        receiver: "Pacific Distribution Group, Seattle Center",
-        service: "Ocean Carrier Vessel Consignee",
-        weight: "14,500 kg",
-        dimensions: "20ft Premium High-Cube Container",
-        barcode: "||| | ||| || ||| || ||| ||",
-        tempSensor: "15.4°C (Optimal Container Temp)",
-        times: ["May 08, 10:00 AM", "May 25, 04:12 PM", "Pending Release", "Pending Release"],
-        timeline: [
-            { time: "May 26, 2026 - 09:00 AM", event: "Customs Inspection Hold", loc: "Port of Seattle Customs Compound", icon: "fa-circle-exclamation", desc: "Random customs check initiated. Import duty declaration under inspection. Agent broker has been notified." },
-            { time: "May 25, 2026 - 04:12 PM", event: "Cargo Vessel Docked & Discharged", loc: "Port of Seattle Dock Terminal 18", icon: "fa-ship", desc: "Container vessel MSC Oceanica arrived safely. Container discharged and routed to container yard." },
-            { time: "May 10, 2026 - 11:30 PM", event: "Vessel Departed Origin Port", loc: "Shanghai Deepwater Port", icon: "fa-anchor", desc: "Ocean freight corridor transit route initiated across trans-pacific line." },
-            { time: "May 08, 2026 - 10:00 AM", event: "Manifest Registered & Containerized", loc: "Shanghai Industrial Zone Depot", icon: "fa-file-signature", desc: "Waybill registered. Export packing checks completed and standard security seals applied." }
-        ]
-    }
-};
+// Prepopulated logistics records cleared as requested
+const INITIAL_DATABASE = {};
 
 // Utility to read JSON database
 function readDatabase() {
@@ -121,6 +53,30 @@ function saveDatabase(dbData) {
         fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 4), 'utf8');
     } catch (error) {
         console.error("Critical: Failed to save tracking records to system:", error);
+    }
+}
+
+// Utility to format server-side dates when custom UI dates are not provided
+function formatBackendDateTime(dateObj, longFormat = true) {
+    if (!dateObj) return null;
+    const d = new Date(dateObj);
+    if (isNaN(d.getTime())) return null;
+    
+    const month = d.toLocaleDateString('en-US', { month: 'short' });
+    const day = d.toLocaleDateString('en-US', { day: '2-digit' });
+    const year = d.getFullYear();
+    
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    const timeStr = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+    
+    if (longFormat) {
+        return `${month} ${day}, ${year} - ${timeStr}`;
+    } else {
+        return `${month} ${day}, ${timeStr}`;
     }
 }
 
@@ -168,6 +124,7 @@ app.get('/api/shipments/:id', (req, res) => {
 app.post('/api/shipments/create', (req, res) => {
     const { 
         shipper, receiver, service, status, weight, dimensions, temp, m1, m2, m3, m4,
+        initiatedDate, initiatedDateShort,
         departedDate, departedDateShort,
         onTransitDate, onTransitDateShort,
         deliveredDate, deliveredDateShort 
@@ -191,18 +148,113 @@ app.post('/api/shipments/create', (req, res) => {
         badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
         step = 3;
     } else if (status === 'Delivered') {
-        badgeClass = "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30";
+        badgeClass = "bg-emerald-500/10 text-[#22C55E] border border-emerald-500/30";
         step = 4;
     } else if (status === 'Customs Exception') {
         badgeClass = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
         step = 2;
     }
 
-    // 3. Assemble complete package JSON object with custom dates if provided
+    // Generate chronological fallbacks in case custom form values are empty
+    const now = new Date();
+    const fallbackInitiated = formatBackendDateTime(now, true);
+    const fallbackInitiatedShort = formatBackendDateTime(now, false);
+
+    const sortedTime = new Date(now.getTime() + 4 * 60 * 60 * 1000); // + 4 hours
+    const fallbackDeparted = formatBackendDateTime(sortedTime, true);
+    const fallbackDepartedShort = formatBackendDateTime(sortedTime, false);
+
+    const transitTime = new Date(now.getTime() + 12 * 60 * 60 * 1000); // + 12 hours
+    const fallbackOnTransit = formatBackendDateTime(transitTime, true);
+    const fallbackOnTransitShort = formatBackendDateTime(transitTime, false);
+
+    const deliveryTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // + 24 hours
+    const fallbackDelivered = formatBackendDateTime(deliveryTime, true);
+    const fallbackDeliveredShort = formatBackendDateTime(deliveryTime, false);
+
+    const finalInitiatedShort = initiatedDateShort || fallbackInitiatedShort;
+    const finalDepartedShort = departedDateShort || fallbackDepartedShort;
+    const finalOnTransitShort = onTransitDateShort || fallbackOnTransitShort;
+    const finalDeliveredShort = deliveredDateShort || fallbackDeliveredShort;
+
+    // 3. Formulate ETA directly matching the custom delivery date
+    let etaValue = "Awaiting Processing";
+    if (status === 'Delivered') {
+        etaValue = `Delivered successfully (${finalDeliveredShort})`;
+    } else if (status === 'Customs Exception') {
+        etaValue = "Hold (Awaiting Customs)";
+    } else if (status === 'In Transit') {
+        etaValue = `Scheduled Delivery: ${finalDeliveredShort}`;
+    } else {
+        etaValue = `ETA: ${finalDeliveredShort}`;
+    }
+
+    const timesArray = [
+        finalInitiatedShort,
+        step >= 2 ? finalDepartedShort : "Pending Sorting",
+        step >= 3 ? finalOnTransitShort : "Pending Dispatch",
+        step >= 4 ? finalDeliveredShort : "Pending Delivery"
+    ];
+
+    // 4. Construct sequential timeline logs according to chosen custom dates
+    const timeline = [];
+
+    // Step 1: Initiated Log
+    timeline.push({
+        time: initiatedDate || fallbackInitiated,
+        event: m1 || "Manifest Initiated & Picked Up",
+        loc: shipper.split(',')[1]?.trim() || "Shipper Origin Facility Warehouse",
+        icon: "fa-truck-ramp-box",
+        desc: "Package collection completed. Waybill tags generated securely."
+    });
+
+    // Step 2: Sorted or Customs Log
+    if (step >= 2) {
+        if (status === 'Customs Exception') {
+            timeline.unshift({
+                time: departedDate || fallbackDeparted,
+                event: m2 || "Customs Inspection Hold",
+                loc: "Port Customs Checkpoint Area",
+                icon: "fa-circle-exclamation",
+                desc: "Random customs check initiated. Import duty declaration under inspection. Agent broker has been notified."
+            });
+        } else {
+            timeline.unshift({
+                time: departedDate || fallbackDeparted,
+                event: m2 || "Freight Sorted & Consolidated",
+                loc: "Carrier Dispatch Center",
+                icon: "fa-warehouse",
+                desc: "Cargo consolidated on linehaul truck loading ramps."
+            });
+        }
+    }
+
+    // Step 3: Transit Log
+    if (step >= 3) {
+        timeline.unshift({
+            time: onTransitDate || fallbackOnTransit,
+            event: m3 || "Departed facility node on route transit",
+            loc: "Gateway Sorting Node",
+            icon: "fa-truck-fast",
+            desc: "Container manifest dispatched toward target delivery terminal."
+        });
+    }
+
+    // Step 4: Delivered Log
+    if (step >= 4) {
+        timeline.unshift({
+            time: deliveredDate || fallbackDelivered,
+            event: m4 || "Cargo Delivered & Completed",
+            loc: receiver.split(',')[0]?.trim() || "Destination Receiver Dock",
+            icon: "fa-circle-check",
+            desc: "Cargo offloaded. Checked out cleanly. Received and signed by local consignee."
+        });
+    }
+
     const newPackage = {
         waybill: `WB-${Math.floor(Math.random() * 800000) + 100000}-${generatedID}`,
-        eta: status === 'Delivered' ? 'Delivered successfully' : 'In 4 Business Days',
-        location: status === 'Delivered' ? receiver : "En Route Gateway Center",
+        eta: etaValue,
+        location: status === 'Delivered' ? (receiver.split(',')[0] || receiver) : (status === 'In Transit' ? "En Route Gateway Center" : "Sorting Hub Depot"),
         status: status,
         badgeClass: badgeClass,
         step: step,
@@ -213,21 +265,11 @@ app.post('/api/shipments/create', (req, res) => {
         dimensions: dimensions || "40x40x40 cm",
         barcode: `||| ||| | || ${randomNumber} ||`,
         tempSensor: temp || "18.5°C",
-        times: [
-            "May 27, 09:00 AM",
-            step >= 2 ? (departedDateShort || "May 27, 02:30 PM") : "Pending Sorting",
-            step >= 3 ? (onTransitDateShort || "May 28, 10:15 AM") : "Pending Dispatch",
-            step >= 4 ? (deliveredDateShort || "May 28, 04:45 PM") : "Pending Delivery"
-        ],
-        timeline: [
-            { time: deliveredDate || "May 28, 2026 - 11:00 AM", event: m4 || "Awaiting delivery hub dispatch", loc: "Target Terminal Hub", icon: "fa-map-pin", desc: "Consignment parameters tracked and registered. Transition log approved." },
-            { time: onTransitDate || "May 28, 2026 - 08:30 AM", event: m3 || "Departed facility node on route transit", loc: "Gateway Sorting Node", icon: "fa-truck", desc: "Container manifest dispatched toward target delivery terminal." },
-            { time: departedDate || "May 27, 2026 - 02:30 PM", event: m2 || "Freight Sorted & Consolidated", loc: "Carrier Dispatch Center", icon: "fa-warehouse", desc: "Cargo consolidated on linehaul truck loading ramps." },
-            { time: "May 27, 2026 - 09:00 AM", event: m1 || "Manifest Initiated & Picked Up", loc: shipper.split(',')[1] || "Origin Yard", icon: "fa-truck-ramp-box", desc: "Package collection completed. Waybill tags generated securely." }
-        ]
+        times: timesArray,
+        timeline: timeline
     };
 
-    // 4. Save to filesystem
+    // 5. Save to database
     const database = readDatabase();
     database[generatedID] = newPackage;
     saveDatabase(database);
@@ -267,7 +309,6 @@ app.put('/api/shipments/:id/status', (req, res) => {
         step = 2;
         cargo.eta = "Hold (Awaiting Customs)";
     } else {
-        // Defaulting status like Sorting Depot
         badgeClass = "bg-sky-500/10 text-sky-500 border border-sky-500/30";
         step = 1;
         cargo.eta = "Processing in Depot";
@@ -279,13 +320,20 @@ app.put('/api/shipments/:id/status', (req, res) => {
     // Append update event to timeline logs
     const now = new Date();
     const formattedTime = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + " - " + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const formattedTimeShort = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) + ", " + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     
-    // Choose icon base on status
+    // Choose icon based on status
     let eventIcon = 'fa-clock';
     if (status === 'Delivered') eventIcon = 'fa-circle-check';
     else if (status === 'In Transit') eventIcon = 'fa-truck-fast';
     else if (status === 'Customs Exception') eventIcon = 'fa-circle-exclamation';
     else if (status === 'Sorting Depot') eventIcon = 'fa-warehouse';
+
+    // Update steps chronologically if needed
+    if (step >= 1) cargo.times[0] = cargo.times[0] === "Pending Sorting" ? formattedTimeShort : cargo.times[0];
+    if (step >= 2) cargo.times[1] = cargo.times[1] === "Pending Sorting" ? formattedTimeShort : cargo.times[1];
+    if (step >= 3) cargo.times[2] = cargo.times[2] === "Pending Dispatch" ? formattedTimeShort : cargo.times[2];
+    if (step >= 4) cargo.times[3] = cargo.times[3] === "Pending Delivery" ? formattedTimeShort : cargo.times[3];
 
     cargo.timeline.unshift({
         time: formattedTime,
@@ -415,7 +463,7 @@ app.get('/admin', (req, res) => {
                         <i class="fa-solid fa-satellite-dish animate-pulse"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg">CargoLink Central</h1>
+                        <h1 class="font-bold text-lg">CargoTracker Central</h1>
                         <p class="text-[9px] text-slate-400 tracking-widest uppercase font-semibold">Live System Terminal</p>
                     </div>
                 </div>
@@ -483,9 +531,13 @@ app.get('/admin', (req, res) => {
                         <!-- CUSTOM TIMESTAMPS FOR THE NEW CARGO ENTRY -->
                         <div class="border-t border-slate-100 pt-3">
                             <span class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">Custom Timeline Schedules</span>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <div>
-                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">Departed Date</label>
+                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">Picked Up Date</label>
+                                    <input type="datetime-local" id="initiatedDate" class="w-full bg-slate-50 border border-slate-200 rounded p-2 outline-none focus:border-primary text-[10px]">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">Sorted Date</label>
                                     <input type="datetime-local" id="departedDate" class="w-full bg-slate-50 border border-slate-200 rounded p-2 outline-none focus:border-primary text-[10px]">
                                 </div>
                                 <div>
@@ -604,12 +656,12 @@ app.get('/admin', (req, res) => {
                 const ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12;
                 hours = hours ? hours : 12; 
-                const timeStr = \`\${String(hours).padStart(2, '0')}:\${minutes} \${ampm}\`;
+                const finalTimeStr = \`\${String(hours).padStart(2, '0')}:\${minutes} \${ampm}\`;
                 
                 if (longFormat) {
-                    return \`\${month} \${day}, \${year} - \${timeStr}\`;
+                    return \`\${month} \${day}, \${year} - \${finalTimeStr}\`;
                 } else {
-                    return \`\${month} \${day}, \${timeStr}\`;
+                    return \`\${month} \${day}, \${finalTimeStr}\`;
                 }
             }
 
@@ -710,6 +762,7 @@ app.get('/admin', (req, res) => {
             document.getElementById('createForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
+                const initiatedRaw = document.getElementById('initiatedDate').value;
                 const departedRaw = document.getElementById('departedDate').value;
                 const onTransitRaw = document.getElementById('onTransitDate').value;
                 const deliveredRaw = document.getElementById('deliveredDate').value;
@@ -723,6 +776,8 @@ app.get('/admin', (req, res) => {
                     dimensions: document.getElementById('dimensions').value,
                     temp: document.getElementById('temp').value,
                     // Format dates into long and short strings to match default schema layouts
+                    initiatedDate: formatDateTime(initiatedRaw, true),
+                    initiatedDateShort: formatDateTime(initiatedRaw, false),
                     departedDate: formatDateTime(departedRaw, true),
                     departedDateShort: formatDateTime(departedRaw, false),
                     onTransitDate: formatDateTime(onTransitRaw, true),
@@ -818,7 +873,7 @@ app.get('/admin', (req, res) => {
 // Start Server Loop listener
 app.listen(PORT, () => {
     console.log(`===================================================`);
-    console.log(` 📡 CARGOLINK LOGISTICS ACTIVE BACKEND RUNNING`);
+    console.log(` 📡 CARGOTRACKER LOGISTICS ACTIVE BACKEND RUNNING`);
     console.log(`🏠 Public API Root: http://localhost:${PORT}`);
     console.log(`💼 Private Admin Console link: http://localhost:${PORT}/admin`);
     console.log(`===================================================`);
