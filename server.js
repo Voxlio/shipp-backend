@@ -509,7 +509,7 @@ app.get('/admin', (req, res) => {
         </div>
 
         <script>
-            const API_BASE = "http://localhost:" + ${PORT};
+            const API_BASE = window.location.origin;
 
             // Custom UI Notification Banner (Toast)
             function showNotification(msg, type = 'success') {
