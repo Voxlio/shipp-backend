@@ -71,7 +71,7 @@ const INITIAL_DATABASE = {
         timeline: [
             { time: "May 25, 2026 - 01:20 PM", event: "Cargo Delivered & Completed", loc: "Manhattan Corporate Assembly Office", icon: "fa-circle-check", desc: "Cargo offloaded. Checked out cleanly. Received and signed by operations lead Andrew Carter." },
             { time: "May 25, 2026 - 07:45 AM", event: "Out for Final Mile Delivery", loc: "New York Terminal Gate 3", icon: "fa-truck-fast", desc: "Consolidated load transferred to local delivery courier for dock delivery." },
-            { time: "May 24, 2026 - 10:45 PM", event: "Arrived at Regional Distribution Hub", loc: "New York Jersey Terminals", icon: "fa-warehouse", desc: "Cross-dock de-consolidation initiated. Long-haul trailer disconnected safely." },
+            { time: "May 24, 10:45 PM", event: "Arrived at Regional Distribution Hub", loc: "New York Jersey Terminals", icon: "fa-warehouse", desc: "Cross-dock de-consolidation initiated. Long-haul trailer disconnected safely." },
             { time: "May 22, 2026 - 02:00 PM", event: "Interstate Transit Gate Clearance", loc: "Chicago Transit Plaza Checkpoint", icon: "fa-truck", desc: "Midwest route checkpoint verified. Carrier telemetry reports zero mechanical anomalies." },
             { time: "May 21, 2026 - 09:00 AM", event: "Cargo Picked Up & Sealing Completed", loc: "Los Angeles Depot Loading Ramp", icon: "fa-box-open", desc: "Refrigerated trailer loaded. Barcodes assigned and structural tracking enabled." }
         ]
@@ -166,7 +166,12 @@ app.get('/api/shipments/:id', (req, res) => {
 
 // Register and Generate brand new waybill
 app.post('/api/shipments/create', (req, res) => {
-    const { shipper, receiver, service, status, weight, dimensions, temp, m1, m2, m3, m4 } = req.body;
+    const { 
+        shipper, receiver, service, status, weight, dimensions, temp, m1, m2, m3, m4,
+        departedDate, departedDateShort,
+        onTransitDate, onTransitDateShort,
+        deliveredDate, deliveredDateShort 
+    } = req.body;
 
     if (!shipper || !receiver) {
         return res.status(400).json({ error: "Origin shipper and destination receiver details are mandatory." });
@@ -193,7 +198,7 @@ app.post('/api/shipments/create', (req, res) => {
         step = 2;
     }
 
-    // 3. Assemble complete package JSON object
+    // 3. Assemble complete package JSON object with custom dates if provided
     const newPackage = {
         waybill: `WB-${Math.floor(Math.random() * 800000) + 100000}-${generatedID}`,
         eta: status === 'Delivered' ? 'Delivered successfully' : 'In 4 Business Days',
@@ -210,14 +215,14 @@ app.post('/api/shipments/create', (req, res) => {
         tempSensor: temp || "18.5°C",
         times: [
             "May 27, 09:00 AM",
-            step >= 2 ? "May 27, 02:30 PM" : "Pending Sorting",
-            step >= 3 ? "May 28, 10:15 AM" : "Pending Dispatch",
-            step >= 4 ? "May 28, 04:45 PM" : "Pending Delivery"
+            step >= 2 ? (departedDateShort || "May 27, 02:30 PM") : "Pending Sorting",
+            step >= 3 ? (onTransitDateShort || "May 28, 10:15 AM") : "Pending Dispatch",
+            step >= 4 ? (deliveredDateShort || "May 28, 04:45 PM") : "Pending Delivery"
         ],
         timeline: [
-            { time: "May 28, 2026 - 11:00 AM", event: m4 || "Awaiting delivery hub dispatch", loc: "Target Terminal Hub", icon: "fa-map-pin", desc: "Consignment parameters tracked and registered. Transition log approved." },
-            { time: "May 28, 2026 - 08:30 AM", event: m3 || "Departed facility node on route transit", loc: "Gateway Sorting Node", icon: "fa-truck", desc: "Container manifest dispatched toward target delivery terminal." },
-            { time: "May 27, 2026 - 02:30 PM", event: m2 || "Freight Sorted & Consolidated", loc: "Carrier Dispatch Center", icon: "fa-warehouse", desc: "Cargo consolidated on linehaul truck loading ramps." },
+            { time: deliveredDate || "May 28, 2026 - 11:00 AM", event: m4 || "Awaiting delivery hub dispatch", loc: "Target Terminal Hub", icon: "fa-map-pin", desc: "Consignment parameters tracked and registered. Transition log approved." },
+            { time: onTransitDate || "May 28, 2026 - 08:30 AM", event: m3 || "Departed facility node on route transit", loc: "Gateway Sorting Node", icon: "fa-truck", desc: "Container manifest dispatched toward target delivery terminal." },
+            { time: departedDate || "May 27, 2026 - 02:30 PM", event: m2 || "Freight Sorted & Consolidated", loc: "Carrier Dispatch Center", icon: "fa-warehouse", desc: "Cargo consolidated on linehaul truck loading ramps." },
             { time: "May 27, 2026 - 09:00 AM", event: m1 || "Manifest Initiated & Picked Up", loc: shipper.split(',')[1] || "Origin Yard", icon: "fa-truck-ramp-box", desc: "Package collection completed. Waybill tags generated securely." }
         ]
     };
@@ -475,6 +480,25 @@ app.get('/admin', (req, res) => {
                             </div>
                         </div>
 
+                        <!-- CUSTOM TIMESTAMPS FOR THE NEW CARGO ENTRY -->
+                        <div class="border-t border-slate-100 pt-3">
+                            <span class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">Custom Timeline Schedules</span>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">Departed Date</label>
+                                    <input type="datetime-local" id="departedDate" class="w-full bg-slate-50 border border-slate-200 rounded p-2 outline-none focus:border-primary text-[10px]">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">On Transit Date</label>
+                                    <input type="datetime-local" id="onTransitDate" class="w-full bg-slate-50 border border-slate-200 rounded p-2 outline-none focus:border-primary text-[10px]">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-400 uppercase tracking-[0.05em] mb-1 text-[9px]">Delivered Date</label>
+                                    <input type="datetime-local" id="deliveredDate" class="w-full bg-slate-50 border border-slate-200 rounded p-2 outline-none focus:border-primary text-[10px]">
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="w-full py-3 bg-primary hover:bg-rose-600 text-white font-bold rounded-xl tracking-wider uppercase shadow transition-all flex items-center justify-center gap-1.5 mt-4">
                             <i class="fa-solid fa-plus"></i> Inject Into Database
                         </button>
@@ -563,6 +587,30 @@ app.get('/admin', (req, res) => {
                     onAccept();
                     cleanUp();
                 };
+            }
+
+            // Custom Formatter to convert input date-time values into the tracking UI style
+            function formatDateTime(val, longFormat = true) {
+                if (!val) return null;
+                const d = new Date(val);
+                if (isNaN(d.getTime())) return null;
+                
+                const month = d.toLocaleDateString('en-US', { month: 'short' });
+                const day = d.toLocaleDateString('en-US', { day: '2-digit' });
+                const year = d.getFullYear();
+                
+                let hours = d.getHours();
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; 
+                const timeStr = \`\${String(hours).padStart(2, '0')}:\${minutes} \${ampm}\`;
+                
+                if (longFormat) {
+                    return \`\${month} \${day}, \${year} - \${timeStr}\`;
+                } else {
+                    return \`\${month} \${day}, \${timeStr}\`;
+                }
             }
 
             // Check if user is already authenticated
@@ -661,6 +709,11 @@ app.get('/admin', (req, res) => {
             // Create submission
             document.getElementById('createForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                
+                const departedRaw = document.getElementById('departedDate').value;
+                const onTransitRaw = document.getElementById('onTransitDate').value;
+                const deliveredRaw = document.getElementById('deliveredDate').value;
+
                 const payload = {
                     shipper: document.getElementById('shipper').value,
                     receiver: document.getElementById('receiver').value,
@@ -668,7 +721,14 @@ app.get('/admin', (req, res) => {
                     status: document.getElementById('status').value,
                     weight: document.getElementById('weight').value,
                     dimensions: document.getElementById('dimensions').value,
-                    temp: document.getElementById('temp').value
+                    temp: document.getElementById('temp').value,
+                    // Format dates into long and short strings to match default schema layouts
+                    departedDate: formatDateTime(departedRaw, true),
+                    departedDateShort: formatDateTime(departedRaw, false),
+                    onTransitDate: formatDateTime(onTransitRaw, true),
+                    onTransitDateShort: formatDateTime(onTransitRaw, false),
+                    deliveredDate: formatDateTime(deliveredRaw, true),
+                    deliveredDateShort: formatDateTime(deliveredRaw, false)
                 };
 
                 try {
@@ -758,7 +818,7 @@ app.get('/admin', (req, res) => {
 // Start Server Loop listener
 app.listen(PORT, () => {
     console.log(`===================================================`);
-    console.log(`📡 CARGOLINK LOGISTICS ACTIVE BACKEND RUNNING`);
+    console.log(` 📡 CARGOLINK LOGISTICS ACTIVE BACKEND RUNNING`);
     console.log(`🏠 Public API Root: http://localhost:${PORT}`);
     console.log(`💼 Private Admin Console link: http://localhost:${PORT}/admin`);
     console.log(`===================================================`);
